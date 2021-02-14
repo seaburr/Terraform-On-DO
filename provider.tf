@@ -8,5 +8,5 @@ terraform {
 }
 
 data "digitalocean_ssh_key" "ssh_key_name" {
-    name = "zbook"
+    name = var.key_name
 }
