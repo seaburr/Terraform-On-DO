@@ -7,6 +7,7 @@ resource "digitalocean_droplet" "web-node-1" {
   ssh_keys = [
     data.digitalocean_ssh_key.ssh_key_name.id
   ]
+    tags = [ digitalocean_tag.web-tag.id ]
   connection {
     host = self.ipv4_address
     user = "root"
@@ -33,6 +34,7 @@ resource "digitalocean_droplet" "web-node-2" {
   ssh_keys = [
     data.digitalocean_ssh_key.ssh_key_name.id
   ]
+  tags = [ digitalocean_tag.web-tag.id ]
   connection {
     host = self.ipv4_address
     user = "root"

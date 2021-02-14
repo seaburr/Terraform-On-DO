@@ -7,6 +7,7 @@ resource "digitalocean_droplet" "nfs-node" {
   ssh_keys = [
     data.digitalocean_ssh_key.ssh_key_name.id
   ]
+  tags = [ digitalocean_tag.nfs-tag.id ]
   connection {
     host = self.ipv4_address
     user = "root"

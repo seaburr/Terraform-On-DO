@@ -1,5 +1,5 @@
 resource "digitalocean_domain" "web-domain" {
-   name = "barista.cloud"
+   name = var.host_name
    ip_address = digitalocean_loadbalancer.loadbalancer.ip
 }
 
