@@ -45,9 +45,11 @@ resource "digitalocean_droplet" "web-node-2" {
   provisioner "remote-exec" {
     inline = [
       "export PATH=$PATH:/usr/bin",
-      # install nginx
+      # Install Apache
       "sudo apt-get update",
-      "sudo apt-get -y install nginx"
+      "sudo apt-get -y install apache2",
+      # Install NFS
+      "sudo apt-get -y install nfs-common"
     ]
   }
 }

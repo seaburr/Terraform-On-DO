@@ -35,5 +35,7 @@ destroy:
 	-input=false \
 
 inventory:
-	terraform show \
-	-json
+	python inventory.py
+
+save_inventory:
+	python inventory.py --save

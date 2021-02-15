@@ -18,7 +18,7 @@ resource "digitalocean_droplet" "nfs-node" {
   provisioner "remote-exec" {
     inline = [
       "export PATH=$PATH:/usr/bin",
-      # install NFS
+      # Install NFS
       "sudo apt-get update",
       "sudo apt-get -y install nfs-kernel-server"
     ]
