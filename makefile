@@ -3,7 +3,7 @@ KEY_PATH = ${HOMEDRIVE}${HOMEPATH}\.ssh\id_rsa
 VAR_FILE = barista.cloud.tfvars
 
 init:
-	terrform init
+	terraform init
 
 plan:
 	terraform plan \
@@ -35,7 +35,7 @@ destroy:
 	-input=false \
 
 inventory:
-	python inventory.py
+	python inventory.py --list
 
 save_inventory:
 	python inventory.py --save

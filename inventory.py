@@ -14,7 +14,6 @@ relevant_tf_state_values = {
     'digitalocean_ssh_key': ['name', 'fingerprint']
 }
 
-
 extra_vars = {
     'ansible_ssh_user': 'root',
     'web_mount_point': '/mnt/nfs/data',
