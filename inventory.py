@@ -1,9 +1,4 @@
-'''
-This script generates a dynamic Ansible inventory file from DigitalOcean Terraform state files. There is a dict
-that define which values to collect out of resources for variables for host groups. Theres a second dict that defines
-any extra variables that need to be added to each host group. Default behavior is to print out the inventory as Ansible
-expects. There's an optional flag of --save/-s that will generate save the inventory file to inventory.json
-'''
+#!/usr/bin/python3
 
 import subprocess
 import argparse
@@ -76,13 +71,13 @@ class DigitalOceanInventory(object):
     def _generate_ansible_inventory(self):
         inventory = {}
         for tag in self.tags:
-            hosts = {}
+            hosts = []
             public_ips = []
             private_ips = []
             inventory[tag] = {}
             for droplet in self.droplets:
                 if tag in droplet['digitalocean_droplet_tags']:
-                    hosts[droplet['digitalocean_droplet_ipv4_address']] = droplet['digitalocean_droplet_name']
+                    hosts.append(droplet['digitalocean_droplet_ipv4_address'])
                     public_ips.append(droplet['digitalocean_droplet_ipv4_address'])
                     private_ips.append(droplet['digitalocean_droplet_ipv4_address_private'])
                 inventory[tag]['hosts'] = hosts
@@ -105,11 +100,12 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--save', '-s', help='Generates Ansible inventory and stores to disk as inventory.json.',
                         action='store_true')
+    parser.add_argument('--list', action='store_true')
     args = parser.parse_args()
     do = DigitalOceanInventory()
-    if not args.save:
+    if args.list:
         print(do.get_inventory())
-    else:
+    elif args.save:
         with open('inventory.json', 'w') as inventory:
             inventory.write(do.get_inventory())
 
