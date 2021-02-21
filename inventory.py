@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import os
+import sys
 import subprocess
 import argparse
 import json
@@ -34,7 +35,7 @@ class DigitalOceanInventory(object):
         self.ansible_inventory = self._generate_ansible_inventory()
     
     def _get_terraform_output(self):
-        os.chdir('infrastructure')
+        os.chdir(f'{sys.path[0]}/infrastructure')
         process = subprocess.Popen(['terraform', 'show', '-json'],
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE,

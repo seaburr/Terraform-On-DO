@@ -1,0 +1,49 @@
+[DEFAULT]
+bantime  = 21600
+findtime  = 300
+maxretry = 5
+banaction = iptables-multiport
+backend = systemd
+
+[sshd]
+enabled = true
+
+[apache]
+enabled  = true
+port     = http,https
+filter   = apache-auth
+logpath  = /var/log/httpd/error_log
+maxretry = 3
+findtime = 600
+
+[apache-noscript]
+enabled  = true
+port     = http,https
+filter   = apache-noscript
+logpath  = /var/log/httpd/error_log
+maxretry = 3
+findtime = 600
+
+[apache-overflows]
+enabled  = true
+port     = http,https
+filter   = apache-overflows
+logpath  = /var/log/httpd/error_log
+maxretry = 2
+findtime = 600
+
+[apache-badbots]
+enabled  = true
+port     = http,https
+filter   = apache-badbots
+logpath  = /var/log/httpd/error_log
+maxretry = 2
+findtime = 600
+
+[apache-block-scan-bots]
+enabled = true
+port = http,https
+filter = apache-block-scan-bots
+logpath  = /var/log/httpd/access_log
+maxretry = 5
+findtime = 600

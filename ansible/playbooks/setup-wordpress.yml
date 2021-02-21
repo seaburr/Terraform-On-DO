@@ -1,0 +1,30 @@
+---
+# File: playbooks/setup-wordpress.yml
+# Purpose: Cofigures infrastructure to run Wordpress.
+
+# Play 1: Update all droplets and apply basic configuration to all droplets.
+# - hosts: all
+#   gather_facts: true
+
+#   roles:
+#   - ../roles/centos-base
+#   - ../roles/create-swap
+
+# Play 2: Setup NFS server.
+
+# Play 3: Set up NFS clients.
+
+# Play 4: Configure Apache.
+- hosts: web-nodes
+  gather_facts: true
+
+  vars:
+  - apache_doc_root: '/var/www/html'
+  - apache_hostname: 'localhost'
+
+  roles:
+  - ../roles/configure-apache
+
+  tasks:
+  - name: 'Add a basic index.html'
+    shell: 'echo hello, world! > /var/www/html/index.html'

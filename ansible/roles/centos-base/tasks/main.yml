@@ -1,0 +1,99 @@
+---
+# File: roles/centos-base/tasks/main.yml
+# Purpose: Ensures a standard base for all CentOS 8 machines.
+
+- name: Set hostname to {{ host_name }}
+  hostname:
+    name: '{{ host_name }}'
+  when: host_name is defined
+
+- name: Create non-root user
+  user:
+    name: '{{ base_user }}'
+    group: '{{ base_user_group }}'
+    create_home: true
+    password: '{{ base_password }}'
+  when: base_user is defined
+
+- name: Run updates
+  yum:
+    name: '*'
+    state: latest
+
+- name: Install useful base packages
+  action: >
+    {{ ansible_pkg_mgr }} name={{ item }} state=present update_cache=yes
+  with_items:
+    - firewalld
+    - tar
+    - vim
+    - curl
+    - wget
+    - chrony
+    - epel-release
+    - git
+    - mtr
+
+- name: Install useful EPEL packages
+  action: >
+    {{ ansible_pkg_mgr }} name={{ item }} state=present update_cache=yes
+  with_items:
+    - screen
+    - fail2ban
+    - glances
+
+- name: Check timezone
+  shell: date
+  register: system_time
+
+- name: Set timezone to {{ os_timezone }}
+  shell: timedatectl set-timezone '{{ os_timezone }}'
+  when: system_time.stdout.find('UTC') != -1
+
+- name: Add /etc/chrony.conf
+  file:
+    src: '../files/crony.conf'
+    dest: /etc/chrony.conf
+    backup: true
+
+- name: Ensure chrony is enabled and running
+  service:
+    name: chronyd
+    state: started
+    enabled: true
+
+- name: Ensure firewall is enabled and running
+  service:
+    name: firewalld
+    state: started
+    enabled: true
+
+- name: Configure firewall services
+  action: >
+    firewalld service={{ item }} state=enabled permanent=true immediate=true
+  with_items:
+    - '{{ firewalld_services_needed }}'
+  register: firewall_config
+
+- name: Restart firewall (if needed)
+  service:
+    name: firewalld
+    state: restarted
+    enabled: true
+  when: firewall_config.changed
+
+- name: Copy apache-block-scan-bots.conf
+  copy:
+    src: '../files/apache-block-scan-bots.conf'
+    dest: '/etc/fail2ban/filter.d/apache-block-scan-bots.conf'
+
+- name: Copy fail2ban configuration file
+  copy:
+    src: '../files/jail.local'
+    dest: '/etc/fail2ban/jail.local'
+
+- name: Ensure fail2ban is enabled and running
+  service:
+    name: fail2ban
+    state: started
+    enabled: true

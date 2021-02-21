@@ -1,0 +1,61 @@
+---
+# File: roles/configure-apache/tasks/main.yml
+# Purpose: Installs and configures Apache.
+
+- name: Ensure Apache is installed
+  action: >
+    {{ ansible_pkg_mgr }} name={{ item }} state=present update_cache=yes
+  with_items:
+    - httpd
+    - mod_ssl
+    - mod_security
+
+- name: 'Ensure {{ apache_doc_root }} is present and permissions are correct'
+  file:
+    path: '{{ apache_doc_root }}'
+    state: directory
+    mode: 'u=rwx,g=rx,o=rx'
+
+- name: 'Ensure Apache can access {{ apache_doc_root }}'
+  shell: 'chcon -R --type=httpd_sys_rw_content_t {{ apache_doc_root }}'
+
+- name: Set httpd_can_network_connect flag on and persist
+  seboolean:
+    name: httpd_can_network_connect
+    state: true
+    persistent: true
+
+- name: Set httpd_can_network_connect_db flag on and persist
+  seboolean:
+    name: httpd_can_network_connect_db
+    state: true
+    persistent: true
+
+- name: Reconfigure Apache
+  template:
+    src: ../templates/httpd.conf.j2
+    dest: /etc/httpd/conf/httpd.conf
+    backup: true
+
+- name: 'Add basic vhost file'
+  template:
+    src: ../templates/vhost.conf.j2
+    dest: '/etc/httpd/conf.d/{{ apache_hostname }}.conf'
+    backup: true
+
+- name: Ensure welcome.conf is not present
+  file:
+    path: /etc/httpd/conf.d/welcome.conf
+    state: absent
+
+- name: Copy mod_security configuration file
+  file:
+    src: '../files/mod_security.conf'
+    dest: '/etc/httpd/conf.d/mod_security.conf'
+    backup: true
+
+- name: Ensure Apache is enabled
+  service:
+    name: httpd
+    state: restarted
+    enabled: true

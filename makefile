@@ -1,5 +1,5 @@
 DO_TOKEN = ${DIGITALOCEAN_ACCESS_TOKEN}
-KEY_PATH = ${HOMEDRIVE}${HOMEPATH}\.ssh\id_rsa
+KEY_PATH = ~/.ssh/id_rsa
 VAR_FILE = barista.cloud.tfvars
 
 init:
@@ -39,10 +39,11 @@ destroy:
 	-input=false \
 
 inventory:
-	python inventory.py --list
+	./inventory.py --list
 
 save_inventory:
-	python inventory.py --save
-	
-run_playbook:
-	cd ansible &&
+	./inventory.py --save
+
+run-playbook:
+	cd ansible/playbooks && \
+	ansible-playbook -i ../../inventory.py setup-wordpress.yml
