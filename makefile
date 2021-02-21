@@ -6,6 +6,7 @@ init:
 	terraform init
 
 plan:
+	cd infrastructure && \
 	terraform plan \
 	-var "do_token=${DO_TOKEN}" \
 	-var "private_key=${KEY_PATH}" \
@@ -13,13 +14,15 @@ plan:
 	-input=false
 
 refresh:
-	terraform destroy \
+	cd infrastructure && \
+	terraform refresh \
 	-var "do_token=${DO_TOKEN}" \
 	-var "private_key=${KEY_PATH}" \
 	-var-file=${VAR_FILE} \
 	-input=false
 
 apply:
+	cd infrastructure && \
 	terraform apply \
 	-var "do_token=${DO_TOKEN}" \
 	-var "private_key=${KEY_PATH}" \
@@ -28,6 +31,7 @@ apply:
 	-auto-approve
 
 destroy:
+	cd infrastructure && \
 	terraform destroy \
 	-var "do_token=${DO_TOKEN}" \
 	-var "private_key=${KEY_PATH}" \
@@ -39,3 +43,6 @@ inventory:
 
 save_inventory:
 	python inventory.py --save
+	
+run_playbook:
+	cd ansible &&
