@@ -1,9 +1,10 @@
 resource "digitalocean_droplet" "web-node-1" {
-  image = "ubuntu-18-04-x64"
+  image = var.droplet_distro
   name = "${var.deployment_name}-1"
-  region = "nyc1"
-  size = "s-1vcpu-1gb"
+  region = var.digitalocean_region
+  size = var.droplet_size
   private_networking = true
+  monitoring = true
   ssh_keys = [
     data.digitalocean_ssh_key.ssh_key_name.id
   ]
@@ -26,11 +27,12 @@ resource "digitalocean_droplet" "web-node-1" {
 }
 
 resource "digitalocean_droplet" "web-node-2" {
-  image = "ubuntu-18-04-x64"
+  image = var.droplet_distro
   name = "${var.deployment_name}-2"
-  region = "nyc1"
-  size = "s-1vcpu-1gb"
+  region = var.digitalocean_region
+  size = var.droplet_size
   private_networking = true
+  monitoring = true
   ssh_keys = [
     data.digitalocean_ssh_key.ssh_key_name.id
   ]

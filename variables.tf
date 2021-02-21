@@ -48,6 +48,20 @@ variable "database_user" {
     default = "wordpress"
 }
 
+# DigitalOcean droplet configuration.
+
+variable "droplet_distro" {
+    description = "Desired OS of droplet. See https://slugs.do-api.dev/ for options. Default: CentOS 8 x86"
+    type = string
+    default = "centos-8-x64"
+}
+
+variable "droplet_size" {
+    description = "Desired size of droplet. See https://slugs.do-api.dev/ for options. Default: s-1vcpu-1gb ($5/mo.)"
+    type = string
+    default = "s-1vcpu-1gb"
+}
+
 # DigitalOcean volume configuration.
 
 variable "volume_size" {

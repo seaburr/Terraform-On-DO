@@ -1,9 +1,10 @@
 resource "digitalocean_droplet" "nfs-node" {
-  image = "ubuntu-18-04-x64"
+  image = var.droplet_distro
   name = "${var.deployment_name}-nfs"
   region = var.digitalocean_region
-  size = "s-1vcpu-1gb"
+  size = var.droplet_size
   private_networking = true
+  monitoring = true
   ssh_keys = [
     data.digitalocean_ssh_key.ssh_key_name.id
   ]
