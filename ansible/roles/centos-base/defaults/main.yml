@@ -9,3 +9,5 @@ firewalld_services_needed:
   - 'http'
   - 'https'
   - 'nfs'
+  - rpc-bind
+  - mountd
