@@ -18,7 +18,8 @@ relevant_tf_state_values = {
 
 extra_vars = {
     'ansible_ssh_user': 'root',
-    'web_mount_point': '/mnt/nfs/data',
+    'web_mount_point': '/var/www',
+    'web_sub_directory': 'html',
     'web_mount_point_type': 'nfs',
     'ansible_ssh_common_args': '-o StrictHostKeyChecking=no -o userknownhostsfile=/dev/null'
 }

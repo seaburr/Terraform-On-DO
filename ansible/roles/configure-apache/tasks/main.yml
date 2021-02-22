@@ -16,8 +16,8 @@
     state: directory
     mode: 'u=rwx,g=rx,o=rx'
 
-- name: 'Ensure Apache can access {{ apache_doc_root }}'
-  shell: 'chcon -R --type=httpd_sys_rw_content_t {{ apache_doc_root }}'
+# - name: 'Ensure Apache can access {{ apache_doc_root }}'
+#   shell: 'chcon -R --type=httpd_sys_rw_content_t {{ apache_doc_root }}'
 
 - name: Set httpd_can_network_connect flag on and persist
   seboolean:
@@ -28,6 +28,12 @@
 - name: Set httpd_can_network_connect_db flag on and persist
   seboolean:
     name: httpd_can_network_connect_db
+    state: true
+    persistent: true
+
+- name: Set httpd_use_nfs flag on and persist
+  seboolean:
+    name: httpd_use_nfs
     state: true
     persistent: true
 

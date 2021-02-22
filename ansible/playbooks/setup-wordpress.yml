@@ -3,28 +3,81 @@
 # Purpose: Cofigures infrastructure to run Wordpress.
 
 # Play 1: Update all droplets and apply basic configuration to all droplets.
-# - hosts: all
+- hosts: all
+  gather_facts: true
+
+  roles:
+  - ../roles/centos-base
+  - ../roles/create-swap
+
+# Play 2: Setup NFS server.
+- hosts: nfs-node
+  gather_facts: true
+  
+  tasks:
+  - name: Install NFS
+    action: >
+      {{ ansible_pkg_mgr }} name=nfs-utils state=present update_cache=yes
+    
+  - name: Ensure NFS is enabled and started
+    service:
+      name: nfs-server
+      state: started
+      enabled: true
+
+  - name: Add mountpoint and whitelist web-node IPs
+    lineinfile:
+      path: '/etc/exports'
+      regexp: '^{{ item }}'
+      line: '{{ nfs_mount_point }}     {{ item }}(rw,sync,no_all_squash,root_squash)'
+    with_items: '{{ web_nodes_public_ips }}'
+    register: nfs_exports
+
+  - name: Run exportfs
+    shell: 'exportfs -arv'
+    when: nfs_exports.changed
+
+  - name: 'Ensure directory {{ web_sub_directory }} exists and is configured correctly'
+    file:
+      path: '{{ nfs_mount_point }}/{{ web_sub_directory }}'
+      state: directory
+      owner: nobody
+      group: nobody
+
+# Play 3: Setup wordpress.
+# - hosts: nfs-node
 #   gather_facts: true
 
 #   roles:
-#   - ../roles/centos-base
-#   - ../roles/create-swap
+#   - ../roles/install-wordpress
 
-# Play 2: Setup NFS server.
+# Play 4: Set up NFS clients.
+- hosts: web-nodes
+  gather_facts: true
 
-# Play 3: Set up NFS clients.
+  tasks:
+  - name: Install NFS
+    action: >
+      {{ ansible_pkg_mgr }} name=nfs-utils state=present update_cache=yes
 
-# Play 4: Configure Apache.
+  - name: Install NFS-acl-tools
+    action: >
+      {{ ansible_pkg_mgr }} name=nfs4-acl-tools state=present update_cache=yes
+  
+  - name: Mount NFS 
+    mount:
+      path: '{{ web_mount_point }}'
+      src: '{{ nfs_node_public_ips[0] }}:{{ nfs_mount_point }}'
+      fstype: nfs
+      state: mounted
+
+# Play 5: Configure Apache.
 - hosts: web-nodes
   gather_facts: true
 
   vars:
-  - apache_doc_root: '/var/www/html'
+  - apache_doc_root: '{{ web_mount_point }}/{{ web_sub_directory }}'
   - apache_hostname: 'localhost'
 
   roles:
   - ../roles/configure-apache
-
-  tasks:
-  - name: 'Add a basic index.html'
-    shell: 'echo hello, world! > /var/www/html/index.html'
