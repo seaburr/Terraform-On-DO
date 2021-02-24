@@ -2,6 +2,7 @@ resource "digitalocean_loadbalancer" "loadbalancer" {
   name = "${var.deployment_name}-lb"
   region = var.digitalocean_region
   droplet_tag = "web-nodes"
+  redirect_http_to_https = true
 
   forwarding_rule {
     entry_port = 443

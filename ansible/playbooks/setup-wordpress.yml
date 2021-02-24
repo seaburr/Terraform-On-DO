@@ -45,11 +45,15 @@
       group: nobody
 
 # Play 3: Setup wordpress.
-# - hosts: nfs-node
-#   gather_facts: true
+- hosts: nfs-node
+  gather_facts: true
 
 #   roles:
 #   - ../roles/install-wordpress
+
+  tasks:
+  - name:
+    shell: 'echo hello, from the nfs mount! > {{ nfs_mount_point }}/{{ web_sub_directory }}/index.html'
 
 # Play 4: Set up NFS clients.
 - hosts: web-nodes
