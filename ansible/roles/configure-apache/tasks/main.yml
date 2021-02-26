@@ -10,14 +10,53 @@
     - mod_ssl
     - mod_security
 
+- name: Copy DigitalOcean Root CA Certificate to /etc/pki/ca-trust/source/anchors/
+  copy:
+    src: '../files/ca-certificate.crt'
+    dest: '/etc/pki/ca-trust/source/anchors/'
+  register: do_cert_added
+
+- name: Install DigitalOcean Root CA Certificate
+  shell: update-ca-trust
+  when: do_cert_added.changed
+
+- name: Install packages required to run WordPress
+  action: >
+    {{ ansible_pkg_mgr }} name={{ item }} state=present update_cache=yes
+  with_items:
+    - mysql
+    - php
+    - php-mysqlnd
+    - php-fpm
+    - php-json
+    - php-gd
+    - php-mbstring
+    - php-pdo
+    - php-xml
+    - php-pecl-zip
+    - ImageMagick
+
+- name: Replace configuration file for php-fpm to reduce memory consumption
+  copy:
+    src: '../files/www.conf'
+    dest: '/etc/php-fpm.d/www.conf'
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+  register: phpfpm_config
+
+- name: Restart php-fpm
+  service:
+    name: php-fpm
+    state: restarted
+    enabled: true
+  when: phpfpm_config.changed
+
 - name: 'Ensure {{ apache_doc_root }} is present and permissions are correct'
   file:
     path: '{{ apache_doc_root }}'
     state: directory
     mode: 'u=rwx,g=rx,o=rx'
-
-# - name: 'Ensure Apache can access {{ apache_doc_root }}'
-#   shell: 'chcon -R --type=httpd_sys_rw_content_t {{ apache_doc_root }}'
 
 - name: Set httpd_can_network_connect flag on and persist
   seboolean:

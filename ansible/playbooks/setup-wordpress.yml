@@ -48,8 +48,17 @@
 - hosts: nfs-node
   gather_facts: true
 
-#   roles:
-#   - ../roles/install-wordpress
+  vars:
+  - wp_install_directory: '{{ nfs_mount_point }}/{{ web_sub_directory }}'
+  - wp_backup_directory: '{{ nfs_mount_point }}/backups/'
+  - wp_database_server_port: '{{ digitalocean_database_cluster_port }}'
+  - wp_database_name: '{{ digitalocean_database_user_name }}'
+  - wp_database_user: '{{ digitalocean_database_user_name }}'
+  - wp_database_password: '{{ digitalocean_database_user_password }}'
+  - wp_database_server_endpoint: '{{ digitalocean_database_cluster_host }}'
+
+  roles:
+  - ../roles/install-wordpress
 
   tasks:
   - name:
